@@ -1,3 +1,15 @@
+# WXGUARD PRO — Demo Screenshots
+
+Screenshots below are generated automatically by GitHub Actions from a **simulated, read-only demonstration**. They do not depict live weather alerts or a connected radio. Images refresh when changes are merged into `main`.
+
+![WXGUARD PRO desktop demo](screenshots/wxguard-pro-desktop.png)
+
+<img src="screenshots/wxguard-pro-mobile.png" alt="WXGUARD PRO mobile demonstration" width="390">
+
+[Open demo page](web/demo.html) · [Screenshot workflow](.github/workflows/wxguard-screenshots.yml)
+
+---
+
 # Meshcore Weather
 
 **Off-grid weather for [Meshcore](https://meshcore.co) LoRa mesh networks.** The bot takes NWS EMWIN products (warnings, observations, forecasts, storm reports and more), parses them with canonical NWS tooling, and puts them on a MeshCore channel two ways: compact MeshWX v5 binary datagrams that apps decode offline, and plain-text replies for anyone who sends it a command. In production the products come from a GOES-19 dish received by goestools on a Raspberry Pi, so nothing depends on the internet; NOAA's internet EMWIN feed is the alternative for a bot without a dish.
