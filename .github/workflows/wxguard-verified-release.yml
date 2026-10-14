@@ -1,0 +1,70 @@
+name: WXGUARD PRO Verified Releases
+on:
+  push:
+    branches: [main]
+    tags: ['wxguard-v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wxguard-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'BaconDisk22/WXGUARD-PRO'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test and package web app
+        working-directory: web
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+          npm run single -- --out ../dist/WXGUARD-PRO.html
+      - name: Test and package Python backend
+        run: |
+          python -m pip install --upgrade pip build
+          python -m pip install -e '.[dev,portal]'
+          python -m pytest -q
+          python -m build
+      - name: Create downloadable browser ZIP
+        run: |
+          cd dist
+          zip -j WXGUARD-PRO-offline-web.zip WXGUARD-PRO.html
+      - name: Upload verified artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wxguard-pro-verified
+          path: |
+            dist/WXGUARD-PRO.html
+            dist/WXGUARD-PRO-offline-web.zip
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error
+      - name: Publish prerelease from main
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="wxguard-dev-${GITHUB_SHA:0:12}"
+          gh release create "$tag" dist/WXGUARD-PRO.html dist/WXGUARD-PRO-offline-web.zip dist/*.whl dist/*.tar.gz \
+            --target "$GITHUB_SHA" --title "WXGUARD PRO development ${GITHUB_SHA:0:12}" \
+            --notes "Automated verified development build. Offline Chromium web client and Python packages only; not a native macOS application. Hardware compatibility has not been validated." \
+            --prerelease
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/wxguard-v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/WXGUARD-PRO.html dist/WXGUARD-PRO-offline-web.zip dist/*.whl dist/*.tar.gz \
+            --title "WXGUARD PRO $GITHUB_REF_NAME" \
+            --notes "Verified automated web and Python build. This release does not include a native macOS .app or .dmg."
