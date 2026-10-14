@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "node tools/dev-server.mjs",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.mjs",
     "package": "node tools/package.mjs --zip",
     "single": "node tools/single-file.mjs",
     "strings": "node tools/strings-to-json.mjs"
