@@ -27,12 +27,14 @@ jobs:
       - name: Run web tests
         run: npm test
       - name: Build single-file offline client
-        run: npm run single
+        run: |
+          mkdir -p ../dist
+          npm run single
       - name: Upload offline client
         uses: actions/upload-artifact@v4
         with:
           name: wxguard-pro-offline-web
-          path: web/dist/*.html
+          path: dist/*.html
           if-no-files-found: error
   python:
     name: Python tests
