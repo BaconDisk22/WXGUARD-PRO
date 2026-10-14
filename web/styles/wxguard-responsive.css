@@ -1,0 +1,58 @@
+/* WXGUARD PRO responsive command center refinements */
+:root {
+  --wx-navy: #002d72;
+  --wx-orange: #ff4b00;
+  --wx-midnight: #091827;
+  --wx-steel: #54728c;
+  --wx-connected: #22c55e;
+  --wx-critical: #dc2626;
+  --wx-focus: 0 0 0 3px rgba(255, 75, 0, .4);
+}
+:root[data-theme="dark"] {
+  --bg: #091827;
+  --surface: #14283b;
+  --surface-2: #243746;
+  --surface-hover: #2d4558;
+  --accent: #ff7848;
+}
+:root[data-theme="light"] {
+  --bg: #f3f6f9;
+  --surface: #ffffff;
+  --surface-2: #e8eef4;
+  --surface-hover: #dce7ef;
+  --accent: #b73800;
+}
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--wx-orange);
+  outline-offset: 3px;
+}
+:where(button, a, input, select, textarea):focus:not(:focus-visible) {
+  outline: none;
+}
+:where(.card, .panel, .widget) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+:where(img, svg, canvas, video) {
+  max-width: 100%;
+}
+@media (max-width: 900px) {
+  :where(.dashboard-grid, .widget-grid, .panel-grid) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  }
+}
+@media (max-width: 600px) {
+  :where(.dashboard-grid, .widget-grid, .panel-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :where(.card, .panel, .widget) {
+    max-width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

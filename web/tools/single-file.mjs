@@ -12,7 +12,7 @@
 // This is the one artifact that is not the repository's own files: esbuild flattens the imports.
 // Nothing is minified, so the code in the page is still the code in `src/`, and everything else —
 // the tables, the strings, the basemap — is embedded verbatim.
-import { readFile, writeFile, readdir, stat } from 'node:fs/promises'
+import { readFile, writeFile, mkdir, readdir, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve, relative } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -117,6 +117,7 @@ export async function build({ out, outlines = true } = {}) {
     .replace(/\s*<script type="module" src="[^"]+"><\/script>/,
       () => `\n${embedded}<script>\n${script}</script>`)
 
+  await mkdir(dirname(out), { recursive: true })
   await writeFile(out, page)
   return { out, bytes: Buffer.byteLength(page), files: files.length, outlines }
 }

@@ -1,0 +1,51 @@
+name: WXGUARD PRO Release Candidates
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'wxguard-v*'
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build and test web client
+        working-directory: web
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+          npm run single
+          npm run package
+      - name: Build and test backend
+        run: |
+          python -m pip install --upgrade pip build
+          python -m pip install -e '.[dev]'
+          python -m pytest -q
+          python -m build
+      - name: Upload web candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: wxguard-pro-web-candidate
+          path: |
+            web/dist/*.html
+            web/dist/*.zip
+          if-no-files-found: error
+      - name: Upload Python distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: wxguard-pro-python-candidate
+          path: dist/*
+          if-no-files-found: error
+
+# This workflow intentionally does not publish a macOS app or GitHub Release.
+# Signing, notarization and radio hardware verification must be added first.
