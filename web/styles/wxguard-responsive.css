@@ -56,3 +56,36 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* Legible controls on desktop and compact screens without changing the underlying UI. */
+:where(button, input, select, textarea) {
+  font: inherit;
+}
+:where(button, input, select, textarea, .card, .panel, .widget) {
+  line-height: 1.45;
+}
+:where(button, a) {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+}
+:where(button, a, input, select, textarea):focus-visible {
+  outline-width: 3px;
+  outline-offset: 3px;
+}
+@media (pointer: coarse) {
+  :where(button, select, input[type="button"], input[type="submit"]) {
+    min-height: 44px;
+  }
+}
+@media (max-width: 600px) {
+  :where(button, input, select, textarea) {
+    font-size: max(16px, 1em);
+  }
+}
+@media (forced-colors: active) {
+  :where(button, a, input, select, textarea):focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
