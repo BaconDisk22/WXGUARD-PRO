@@ -23,7 +23,9 @@ jobs:
         with:
           node-version: '22'
       - name: Install browser screenshot tool
+        working-directory: web
         run: |
+          npm install --no-audit --no-fund
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium
       - name: Start local demo server
@@ -37,8 +39,8 @@ jobs:
       - name: Capture desktop and mobile screenshots
         run: |
           mkdir -p screenshots
-          npx playwright screenshot --browser chromium --viewport-size '1440,1000' --wait-for-timeout 1200 --full-page http://127.0.0.1:8765/demo.html screenshots/wxguard-pro-desktop.png
-          npx playwright screenshot --browser chromium --viewport-size '390,844' --wait-for-timeout 1200 --full-page http://127.0.0.1:8765/demo.html screenshots/wxguard-pro-mobile.png
+          web/node_modules/.bin/playwright screenshot --browser chromium --viewport-size '1440,1000' --wait-for-timeout 1200 --full-page http://127.0.0.1:8765/demo.html screenshots/wxguard-pro-desktop.png
+          web/node_modules/.bin/playwright screenshot --browser chromium --viewport-size '390,844' --wait-for-timeout 1200 --full-page http://127.0.0.1:8765/demo.html screenshots/wxguard-pro-mobile.png
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
         with:
