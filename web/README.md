@@ -34,6 +34,8 @@ It is one file of about 20 MB, because the maps, the place names, the ZIP codes,
 zones and the words in eleven languages are all inside it. Keep it anywhere; it works from a stick,
 and it works on a machine that has never been online.
 
+For connection failures or repeated disconnects, see the [radio troubleshooting checklist](docs/RADIO_TROUBLESHOOTING.md).
+
 ## Nothing is arriving
 
 A radio hears only the radios that are on **exactly** the same frequency, bandwidth, spreading
