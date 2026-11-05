@@ -1,8 +1,12 @@
-# MeshWX
+# WXGUARD PRO — MeshCore Weather Client
 
 Severe weather alerts, current conditions, the forecast and radar on your computer, from a weather
 radio on your MeshCore mesh. It runs in your browser, and it never touches the internet: the maps,
 the place names, the ZIP codes and the words in eleven languages are all in the download.
+
+**Demonstration:** [Open the read-only WXGUARD PRO demo](demo.html). It uses simulated weather data and does not connect to or transmit through a radio.
+
+**Release status:** Check the fork's Releases page for actual downloadable assets; this guide does not imply a native Intel Mac app is already published.
 
 ## What you need
 
@@ -17,8 +21,8 @@ Nothing else. Nothing to install, no terminal, and no internet at any point.
 
 ## Start it
 
-1. Download **MeshWX.html** from the
-   [latest release](https://github.com/digitaino/meshwx/releases/latest).
+1. Download the WXGUARD PRO web client from this fork's
+   [Releases page](https://github.com/BaconDisk22/WXGUARD-PRO/releases) when a verified web bundle is available.
 2. Double-click it. It opens in your usual browser: if that is Safari or Firefox, right-click the
    file instead, choose **Open With**, and pick Chrome.
 3. Press **No radio** at the top, then **Connect over Bluetooth** or **Connect over USB**, and
@@ -65,10 +69,9 @@ Weather Service over a satellite dish. No internet there either. That side is
 
 ## The folder version
 
-`meshwx-web.zip` on the same release page is the same client as a folder of ordinary files, with a
+The folder-format web bundle, when included on this fork's Releases page is the same client as a folder of ordinary files, with a
 small server to hand it to the browser. It wants Node or Python installed and a command, and it is
-there for anyone who would rather serve the files, put them on a web server, or read them. The
-one-file download is the same code with the imports flattened and the tables embedded.
+there for anyone who would rather serve the files, put them on a web server, or read them. The one-file build uses the same application code with the imports flattened and the tables embedded.
 
 ## For developers
 
