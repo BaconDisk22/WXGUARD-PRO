@@ -52,3 +52,17 @@ jobs:
         run: python -m pip install -e '.[dev,portal]'
       - name: Run Python tests
         run: python -m pytest -q
+
+  mac-launcher:
+    name: macOS launcher syntax and requirements
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell launcher syntax
+        run: bash -n macos/Launch-WXGUARD-PRO.command
+      - name: Validate bundled launcher paths
+        run: |
+          test -f web/tools/dev-server.mjs
+          test -f macos/README.md
+          grep -q 'Node.js 22' macos/Launch-WXGUARD-PRO.command
+          grep -q 'Chromium' macos/Launch-WXGUARD-PRO.command
