@@ -21,13 +21,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Test and package web app
         working-directory: web
         run: |
-          npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund
           npm test
           npm run single -- --out ../dist/WXGUARD-PRO.html
       - name: Test and package Python backend
