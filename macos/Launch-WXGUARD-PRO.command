@@ -31,6 +31,12 @@ if [ -z "$BROWSER" ]; then
   echo "Install Chrome, Edge, Brave, or Chromium for Web Bluetooth / Web Serial support."
   exit 1
 fi
+# Refuse to attach to a pre-existing service on the requested port.
+# Otherwise a stale/different HTTP server could pass the readiness probe.
+if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN 2>/dev/null | grep -q LISTEN; then
+  echo "Port $PORT is already occupied. Close the other server or set WXGUARD_PORT."
+  exit 1
+fi
 echo "Starting WXGUARD PRO at http://127.0.0.1:$PORT/"
 cd "$WEB"
 node tools/dev-server.mjs --port "$PORT" &
