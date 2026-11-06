@@ -38,11 +38,13 @@ function bridgeToken() {
 }
 
 function safeJoin(root, urlPath) {
-  const path = normalize(join(root, decodeURIComponent(urlPath)))
+  let decoded
+  try { decoded = decodeURIComponent(urlPath) } catch { return null }
+  const path = normalize(join(root, decoded))
   return path === root || path.startsWith(root + sep) ? path : null
 }
 
-function serveFile(res, path) {
+function serveFile(req, res, path) {
   if (!path || !existsSync(path)) return notFound(res)
   let file = path
   if (statSync(file).isDirectory()) file = join(file, 'index.html')
@@ -52,6 +54,7 @@ function serveFile(res, path) {
     'content-length': statSync(file).size,
     'cache-control': 'no-store',
   })
+  if (req.method === 'HEAD') return res.end()
   createReadStream(file).pipe(res)
 }
 
@@ -116,8 +119,8 @@ createServer((req, res) => {
     return res.end('{"ok":true}')
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') return notFound(res)
-  if (url.pathname.startsWith('/data/')) return serveFile(res, safeJoin(dataRoot, url.pathname.slice('/data/'.length)))
-  return serveFile(res, safeJoin(webRoot, url.pathname))
+  if (url.pathname.startsWith('/data/')) return serveFile(req, res, safeJoin(dataRoot, url.pathname.slice('/data/'.length)))
+  return serveFile(req, res, safeJoin(webRoot, url.pathname))
 }).listen(port, '127.0.0.1', () => {
   console.log(`MeshWX web on http://localhost:${port}  (bundle: ${dataRoot})`)
   console.log(bridgeToken() ? `bridge proxy → ${bridge.origin}` : 'bridge proxy off (no MESHWX_BRIDGE_TOKEN_FILE)')
