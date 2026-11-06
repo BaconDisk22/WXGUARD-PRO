@@ -75,6 +75,21 @@ jobs:
             sleep 1
           done
           test "$ready" -eq 1 || { cat /tmp/wxguard-server.log; exit 1; }
+      - name: Verify launcher rejects occupied ports
+        run: |
+          node -e 'require("http").createServer((req,res)=>res.end("unrelated service")).listen(18138,"127.0.0.1")' &
+          blocker_pid=$!
+          trap 'kill "$blocker_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --silent --fail http://127.0.0.1:18138/ >/dev/null; then break; fi
+            sleep 1
+          done
+          if WXGUARD_PORT=18138 bash macos/Launch-WXGUARD-PRO.command > /tmp/wxguard-port.log 2>&1; then
+            echo "Launcher incorrectly succeeded on occupied port"
+            cat /tmp/wxguard-port.log
+            exit 1
+          fi
+          grep -q 'already occupied' /tmp/wxguard-port.log
       - name: Validate shell launcher syntax
         run: bash -n macos/Launch-WXGUARD-PRO.command
       - name: Validate bundled launcher paths
