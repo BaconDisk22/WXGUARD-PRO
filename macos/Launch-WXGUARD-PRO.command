@@ -25,7 +25,7 @@ if [ ! -f "$WEB/tools/dev-server.mjs" ]; then
 fi
 BROWSER=""
 for app in "Google Chrome" "Microsoft Edge" "Brave Browser" "Chromium"; do
-  if [ -d "/Applications/$app.app" ]; then BROWSER="$app"; break; fi
+  if [ -d "/Applications/$app.app" ] || [ -d "$HOME/Applications/$app.app" ]; then BROWSER="$app"; break; fi
 done
 if [ -z "$BROWSER" ]; then
   echo "Install Chrome, Edge, Brave, or Chromium for Web Bluetooth / Web Serial support."
@@ -37,9 +37,20 @@ node tools/dev-server.mjs --port "$PORT" &
 SERVER_PID=$!
 cleanup() { kill "$SERVER_PID" 2>/dev/null || true; wait "$SERVER_PID" 2>/dev/null || true; }
 trap cleanup EXIT INT TERM
-sleep 2
-if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-  echo "Local server did not start. Port $PORT may already be in use."
+READY=0
+for attempt in {1..30}; do
+  if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+    echo "Local server exited unexpectedly. Port $PORT may already be in use."
+    exit 1
+  fi
+  if curl --silent --fail --max-time 1 --output /dev/null "http://127.0.0.1:$PORT/"; then
+    READY=1
+    break
+  fi
+  sleep 1
+done
+if [ "$READY" -ne 1 ]; then
+  echo "Local server did not become ready within 30 seconds."
   exit 1
 fi
 open -a "$BROWSER" "http://127.0.0.1:$PORT/"

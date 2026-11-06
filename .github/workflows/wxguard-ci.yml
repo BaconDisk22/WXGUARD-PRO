@@ -58,6 +58,23 @@ jobs:
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Smoke test localhost web server
+        run: |
+          node web/tools/dev-server.mjs --port 18137 > /tmp/wxguard-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in {1..30}; do
+            if curl --silent --fail --max-time 1 http://127.0.0.1:18137/ | grep -q 'WXGUARD PRO'; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" -eq 1 || { cat /tmp/wxguard-server.log; exit 1; }
       - name: Validate shell launcher syntax
         run: bash -n macos/Launch-WXGUARD-PRO.command
       - name: Validate bundled launcher paths
