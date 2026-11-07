@@ -98,3 +98,23 @@ jobs:
           test -f macos/README.md
           grep -q 'Node.js 22' macos/Launch-WXGUARD-PRO.command
           grep -q 'Chromium' macos/Launch-WXGUARD-PRO.command
+  mac-app:
+    name: macOS app bundle (Intel)
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build WXGUARD PRO.app
+        run: bash macos/build-app.sh
+      - name: Smoke test the app's own server
+        run: bash macos/smoke-test-app.sh
+      - name: Upload macOS app ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: wxguard-pro-macos-app
+          path: |
+            dist/macos/WXGUARD-PRO-macOS.zip
+            dist/macos/WXGUARD-PRO-macOS.zip.sha256
+          if-no-files-found: error
