@@ -126,7 +126,7 @@ export class Navigation {
       h('div', { class: 'navbar__title' }, typeof title === 'string' ? h('h1', null, title) : title),
       h('div', { class: 'navbar__trailing' }, screen.trailing?.() ?? null))
     this.bar = morph(this.bar, nextBar)
-    document.title = typeof title === 'string' && title ? `${title} · MeshWX` : 'MeshWX'
+    document.title = typeof title === 'string' && title ? `${title} · WXGUARD PRO` : 'WXGUARD PRO'
 
     const tools = screen.toolbar?.() ?? null
     const nextFoot = h('footer', { class: 'toolbar', hidden: tools == null }, tools)

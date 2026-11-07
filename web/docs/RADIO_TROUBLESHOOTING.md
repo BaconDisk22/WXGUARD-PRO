@@ -25,8 +25,8 @@ This guide is for the **browser-based MeshCore client**. A native Intel Mac clic
 
 ## Reporting a problem
 
-Open a [GitHub issue](https://github.com/BaconDisk22/WXGUARD-PRO/issues) with reproduction steps, expected/actual behavior and whether the issue also occurs in recorded-data mode. Never include personal radio keys, credentials, or private location data in public logs.
+Open a [GitHub issue](https://github.com/TheLogsAreScreaming/WXGUARD-PRO/issues) with reproduction steps, expected/actual behavior and whether the issue also occurs in recorded-data mode. Never include personal radio keys, credentials, or private location data in public logs.
 
 ## Safety and release status
 
-The [standalone demonstration](../demo.html) contains **simulated** weather only. It does not issue radio transmissions or represent real NWS warnings. Check the [fork's Releases page](https://github.com/BaconDisk22/WXGUARD-PRO/releases) for available builds.
+The [standalone demonstration](../demo.html) contains **simulated** weather only. It does not issue radio transmissions or represent real NWS warnings. Check the [fork's Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO/releases) for available builds.

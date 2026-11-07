@@ -13,8 +13,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  mac-app:
+    if: github.repository == 'TheLogsAreScreaming/WXGUARD-PRO'
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and smoke test WXGUARD PRO.app
+        run: |
+          bash macos/build-app.sh
+          bash macos/smoke-test-app.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wxguard-pro-macos-app
+          path: |
+            dist/macos/WXGUARD-PRO-macOS.zip
+            dist/macos/WXGUARD-PRO-macOS.zip.sha256
+          if-no-files-found: error
+
   release:
-    if: github.repository == 'BaconDisk22/WXGUARD-PRO'
+    if: github.repository == 'TheLogsAreScreaming/WXGUARD-PRO'
+    needs: mac-app
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +59,11 @@ jobs:
           python -m pip install -e '.[dev,portal]'
           python -m pytest -q
           python -m build
+      - name: Fetch macOS app
+        uses: actions/download-artifact@v4
+        with:
+          name: wxguard-pro-macos-app
+          path: dist
       - name: Create downloadable browser ZIP
         run: |
           cd dist
@@ -49,6 +75,8 @@ jobs:
           path: |
             dist/WXGUARD-PRO.html
             dist/WXGUARD-PRO-offline-web.zip
+            dist/WXGUARD-PRO-macOS.zip
+            dist/WXGUARD-PRO-macOS.zip.sha256
             dist/*.whl
             dist/*.tar.gz
           if-no-files-found: error
@@ -58,15 +86,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="wxguard-dev-${GITHUB_SHA:0:12}"
-          gh release create "$tag" dist/WXGUARD-PRO.html dist/WXGUARD-PRO-offline-web.zip dist/*.whl dist/*.tar.gz \
+          gh release create "$tag" dist/WXGUARD-PRO.html dist/WXGUARD-PRO-offline-web.zip dist/WXGUARD-PRO-macOS.zip dist/WXGUARD-PRO-macOS.zip.sha256 dist/*.whl dist/*.tar.gz \
             --target "$GITHUB_SHA" --title "WXGUARD PRO development ${GITHUB_SHA:0:12}" \
-            --notes "Automated verified development build. Offline Chromium web client and Python packages only; not a native macOS application. Hardware compatibility has not been validated." \
+            --notes "Automated development build: macOS app (WXGUARD-PRO-macOS.zip, Intel + Apple Silicon, needs Chrome/Edge/Brave/Chromium; ad-hoc signed, not notarized, see macos/README.md), offline Chromium web client, Python packages. Radio hardware compatibility has not been validated." \
             --prerelease
       - name: Publish tagged release
         if: startsWith(github.ref, 'refs/tags/wxguard-v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/WXGUARD-PRO.html dist/WXGUARD-PRO-offline-web.zip dist/*.whl dist/*.tar.gz \
+          gh release create "$GITHUB_REF_NAME" dist/WXGUARD-PRO.html dist/WXGUARD-PRO-offline-web.zip dist/WXGUARD-PRO-macOS.zip dist/WXGUARD-PRO-macOS.zip.sha256 dist/*.whl dist/*.tar.gz \
             --title "WXGUARD PRO $GITHUB_REF_NAME" \
-            --notes "Verified automated web and Python build. This release does not include a native macOS .app or .dmg."
+            --notes "Verified automated build: macOS app (ad-hoc signed, not notarized), offline web client and Python packages."
