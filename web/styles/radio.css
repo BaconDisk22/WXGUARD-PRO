@@ -56,7 +56,7 @@
 
 .alert-row { align-items: flex-start; gap: 10px; padding-block: 12px; }
 .alert-row .row__icon { margin-top: 1px; }
-.alert-row__name { font-weight: 600; }
+.alert-row__name { font-weight: var(--weight-semibold); }
 /* One line, tail-truncated, as the iOS row is: a storm warning can carry four tags and the row
    is a headline with a time under it, not a tag list. The detail screen shows them in full. */
 .alert-row__tags {
@@ -71,7 +71,7 @@
 
 .detail-head { display: flex; flex-direction: column; gap: 4px; padding: 12px 0 14px; }
 .detail-head > p { padding-inline: 16px; font-size: var(--text-callout); }
-.detail-head__covers { font-weight: 500; }
+.detail-head__covers { font-weight: var(--weight-medium); }
 
 .headline {
   --tint: var(--tint-grey);
@@ -81,7 +81,7 @@
   padding: 0 16px 2px;
 }
 .headline__icon { color: var(--tint); display: grid; place-items: center; }
-.headline__title { font-size: 1.125rem; font-weight: 600; }
+.headline__title { font-size: 1.125rem; font-weight: var(--weight-semibold); }
 
 /* ---------- Maps ---------- */
 
@@ -127,7 +127,7 @@
   gap: 2px;
   margin: 6px 16px 2px;
   padding: 2px;
-  border-radius: 10px;
+  border-radius: var(--radius-small);
   background: var(--surface-2);
 }
 .segmented__option {
@@ -149,8 +149,8 @@
 .segmented__option.is-selected {
   background: var(--surface);
   color: var(--text);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgb(10 20 30 / 0.12);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-card);
 }
 .segmented__option:hover:not(.is-selected) { color: var(--text); }
 
@@ -163,7 +163,7 @@
    ruled off from it: without the line "619 areas under an alert" reads as the rest of the
    country's count. */
 .part + .part, .part + .part-summary { border-top: 1px solid var(--separator); }
-.part__name { font-weight: 600; }
+.part__name { font-weight: var(--weight-semibold); }
 .part .ask-block { padding-top: 4px; }
 
 /* ---------- The state picker (§17) ---------- */
@@ -185,7 +185,7 @@
 .timeline__who {
   padding: 12px 4px 2px;
   font-size: var(--text-label);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-2);
@@ -219,7 +219,7 @@
   background: var(--accent-soft);
 }
 .bubble--mine:hover { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
-.bubble__title { font-weight: 600; overflow-wrap: anywhere; }
+.bubble__title { font-weight: var(--weight-semibold); overflow-wrap: anywhere; }
 .bubble__detail { font-size: var(--text-callout); color: var(--text-2); overflow-wrap: anywhere; }
 .bubble__facts { font-size: var(--text-foot); color: var(--text-3); overflow-wrap: anywhere; }
 /* "from the radio's queue" and "duplicate": what makes this row not simply a message arriving. */
@@ -238,7 +238,7 @@
 }
 .field__name { color: var(--text-2); flex: none; }
 .field__value { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; text-align: end; }
-.field--heading .field__name { color: var(--text); font-weight: 600; }
+.field--heading .field__name { color: var(--text); font-weight: var(--weight-semibold); }
 
 /* The bytes: monospace, wrapping, and selectable, because copying them into a decoder is the
    whole reason this screen shows them. */
@@ -307,3 +307,19 @@
 /* The three swatches, at full strength. `.legend` on its own is the alert map's wrapping row of
    event names; radar has three short ones and they read better spread out. */
 .legend--radar { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+/* ---------- A card that needs attention (missed messages, alerts unknown) ---------- */
+
+.card--attention {
+  background: color-mix(in srgb, var(--stale-soft) 100%, var(--surface));
+  border-color: color-mix(in srgb, var(--stale) 22%, transparent);
+}
+.card--attention .status-line > p:first-child {
+  display: flex; gap: 10px; align-items: flex-start; font-weight: var(--weight-semibold);
+}
+.card--attention .status-line > p:first-child::before {
+  content: ""; flex: none; width: 18px; height: 18px; margin-top: 2px;
+  background: var(--stale);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E") center / contain no-repeat;
+}

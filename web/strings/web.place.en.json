@@ -11,5 +11,7 @@
   "web.place.moveUp": "Move %@ up",
   "web.place.moveDown": "Move %@ down",
   "web.place.removePlace": "Remove %@",
-  "web.place.clearSearch": "Clear the search"
+  "web.place.clearSearch": "Clear the search",
+  "web.place.welcome.title": "Welcome to WXGUARD PRO",
+  "web.place.welcome.text": "Choose a place to get its forecast and alerts. Search for a town, ZIP code or airport, or tap My location. Your location is only asked for when you tap it."
 }

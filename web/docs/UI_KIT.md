@@ -40,10 +40,11 @@ export function WeatherStationsScreen({ app, page }) {
 
 `List`, `Card({ label, labelTrailing, foot })`, `Row({ icon, title, subtitle, value, trailing,
 onclick, stale, destructive, muted, tint, key })`, `Button({ label, icon, kind, small, onclick })`,
-`Banner({ text, detail, actions, kind })`, `Field`, `Select`, `Switch`, `Spinner`, `Empty`, `Prose`,
-`Note`, `openMenu(anchor, items)`. They map onto the classes of `styles/app.css`; read that file
-before adding a class, and add new classes there (one stylesheet), grouped under a comment for your
-screen.
+`Banner({ text, detail, actions, kind: 'warning'|'info'|'success'|'error' })`, `EmptyState`,
+`confirmAction`, `toast`, `Field`, `Select`, `Switch`, `Spinner`, `Empty`, `Prose`, `Note`,
+`openMenu(anchor, items)`. They map onto the classes of `styles/app.css`; read that file before
+adding a class, and add new classes there, grouped under a comment for your screen. Colours, type,
+spacing and motion are tokens from `styles/tokens.css`; see `docs/DESIGN_SYSTEM.md`.
 
 ## Fields: a row you type in or choose from
 
@@ -116,6 +117,6 @@ fingerprint, so a step never moves the camera.
 ## Layout
 
 Mobile first, one column (`--column`), the same on a desktop: weather is read, not tiled. 16 px
-gutters, 44 px minimum targets, both colour schemes through the tokens in `:root`, no fixed
-heights on text, `prefers-reduced-motion` respected. Nothing may be fetched from another origin:
+gutters, 44 px minimum targets, both colour schemes through the `light-dark()` tokens in
+`styles/tokens.css`, no fixed heights on text, `prefers-reduced-motion` respected. Nothing may be fetched from another origin:
 no web fonts, no CDN, no tiles. The tool is for places without internet.

@@ -369,8 +369,18 @@ export class MapCanvas {
 
   #palette() {
     if (this.colors) return this.colors
-    const style = getComputedStyle(this.container)
-    const read = (name, fallback) => style.getPropertyValue(name).trim() || fallback
+    // Tokens are `light-dark(…)` expressions (styles/tokens.css), which a canvas cannot parse, so
+    // each one is resolved by the browser through a hidden probe: its computed `color` is always a
+    // concrete rgb() in whichever theme is in force, forced or followed.
+    this.probe?.remove()
+    const probe = document.createElement('span')
+    probe.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;visibility:hidden'
+    this.container.append(probe)
+    const read = (name, fallback) => {
+      probe.style.color = ''
+      probe.style.color = `var(${name}, ${fallback})`
+      return getComputedStyle(probe).color || fallback
+    }
     this.colors = {
       water: read('--surface-2', '#e9eef2'),
       land: read('--surface', '#ffffff'),
@@ -391,6 +401,14 @@ export class MapCanvas {
       ],
       radarUnknown: read('--radar-unknown', '#8a94a0'),
     }
+    const tint = this.colors.tint
+    const tints = new Map()
+    // Event tints are asked for by name while painting; resolve each once, then keep it.
+    this.colors.tint = (name) => {
+      if (!tints.has(name)) tints.set(name, tint(name))
+      return tints.get(name)
+    }
+    this.probe = probe
     return this.colors
   }
 

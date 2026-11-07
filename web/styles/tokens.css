@@ -1,0 +1,173 @@
+/* WXGUARD PRO design tokens — the one place colours, type, spacing, shape, depth and motion are
+   defined. Every other stylesheet reads these; none defines a colour of its own.
+
+   Two tiers:
+     1. Brand primitives (--brand-*): the WXGUARD identity, named by what they are.
+     2. Semantic tokens (--bg, --text, --accent, --good …): named by the job they do, each defined
+        ONCE for both themes with light-dark(). The theme follows the system; `data-theme="light"`
+        or `"dark"` on <html> forces one (color-scheme drives light-dark()).
+
+   Colour roles, kept apart on purpose:
+     --accent   interactive (buttons, links, selection). Brand navy family, never orange, so a
+                tappable thing can't be mistaken for a warning.
+     --brand    the WXGUARD signal orange. Identity only: the bar stripe, the mark.
+     --stale    amber: something is missing or out of date (a gap is not calm weather).
+     --good / --bad / --info   status.
+     --tint-*   NWS event colours. Their meaning is fixed by the Weather Service; unchanged.
+     --radar-*  radar echo levels. Never an event tint.
+
+   System fonts only: the tool is used where there is no internet. */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---------- 1. Brand primitives ---------- */
+  --brand-navy: #002d72;
+  --brand-orange: #ff4b00;
+  --brand-midnight: #091827;
+
+  /* ---------- 2. Semantic colour ---------- */
+
+  /* Ground, surfaces and lines. Cool, navy-leaning greys rather than neutral grey. */
+  --bg:            light-dark(#f1f4f8, #08131f);
+  --surface:       light-dark(#ffffff, #111f30);
+  --surface-2:     light-dark(#f4f6fa, #172a3f);   /* inset: fields, tags, map water */
+  --surface-hover: light-dark(#eef2f7, #1a2e45);
+  --surface-press: light-dark(#e5ebf2, #213a55);
+  --border:        light-dark(rgb(9 24 39 / 0.07), rgb(255 255 255 / 0.07));
+  --separator:     light-dark(rgb(9 24 39 / 0.10), rgb(255 255 255 / 0.09));
+  --scrim:         rgb(4 10 18 / 0.45);
+
+  /* Ink. All three pass WCAG AA (4.5:1) on --surface and --bg in both themes. */
+  --text:   light-dark(#0b1a2b, #eef3f8);
+  --text-2: light-dark(#475a6e, #a8b8c9);
+  --text-3: light-dark(#5f7184, #8496aa);
+
+  /* Interactive. */
+  --accent:      light-dark(#0b4fae, #74adff);
+  --accent-ink:  light-dark(#ffffff, #04182f);
+  --accent-soft: light-dark(rgb(11 79 174 / 0.10), rgb(116 173 255 / 0.15));
+
+  /* Identity. */
+  --brand:     var(--brand-orange);
+  --brand-ink: #ffffff;
+
+  /* Status. Each has a strong form for icons/text and a soft form for backgrounds. */
+  --stale:      light-dark(#9a4d00, #ffae5e);
+  --stale-soft: light-dark(rgb(196 104 0 / 0.11), rgb(255 174 94 / 0.14));
+  --good:       light-dark(#14713a, #5ad68b);
+  --good-soft:  light-dark(rgb(20 113 58 / 0.10), rgb(90 214 139 / 0.14));
+  --bad:        light-dark(#b8261c, #ff7d72);
+  --bad-soft:   light-dark(rgb(184 38 28 / 0.09), rgb(255 125 114 / 0.14));
+  --bad-ink:    light-dark(#ffffff, #2b0805);   /* text on a --bad fill */
+  --info:       var(--accent);
+  --info-soft:  var(--accent-soft);
+
+  /* NWS event tints (MeshWXEventTint). Meaning set by the Weather Service: values unchanged. */
+  --tint-red:         light-dark(#d92b20, #ff5a4f);
+  --tint-yellow:      light-dark(#c99700, #f2c230);
+  --tint-orange:      light-dark(#e2710b, #ff9838);
+  --tint-lightOrange: light-dark(#d98a2b, #f7ba6b);
+  --tint-darkGreen:   light-dark(#006b3d, #2fae72);
+  --tint-green:       light-dark(#1f9d45, #44d06e);
+  --tint-lightGreen:  light-dark(#4f9f45, #85d678);
+  --tint-orangeRed:   light-dark(#e0501f, #ff7a4a);
+  --tint-pink:        light-dark(#d63a73, #ff6fa3);
+  --tint-purple:      light-dark(#8a3fc4, #c384f5);
+  --tint-lavender:    light-dark(#7a70c8, #b5adee);
+  --tint-tan:         light-dark(#9a7f52, #c9b184);
+  --tint-magenta:     light-dark(#c81b8a, #f05bbb);
+  --tint-blue:        light-dark(#1f6fd0, #5aa2ff);
+  --tint-grey:        light-dark(#6b7580, #9aa4af);
+
+  /* Radar levels (revision 11 §3): green, amber, red at 55% on the map, full in the legend. */
+  --radar-light:    light-dark(#2f9e58, #45d97a);
+  --radar-moderate: light-dark(#cf8b00, #ffc247);
+  --radar-heavy:    light-dark(#cc2f26, #fb5d4d);
+  --radar-unknown:  light-dark(#7b8792, #98a3af);
+
+  /* ---------- Typography ---------- */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  /* rem-based throughout, so the browser/system text size scales everything. */
+  --text-hero:       clamp(4.5rem, 22vw, 6rem);
+  --text-largeTitle: 1.75rem;
+  --text-title2:     1.25rem;
+  --text-title:      1.0625rem;
+  --text-body:       1rem;
+  --text-callout:    0.9375rem;
+  --text-foot:       0.8125rem;
+  --text-label:      0.75rem;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --leading-tight: 1.2;
+  --leading:       1.45;
+  --tracking-label: 0.06em;
+
+  /* ---------- Spacing (4-pt grid) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --gutter: var(--space-4);
+  --column: 640px;
+
+  /* ---------- Shape ---------- */
+  --radius:       16px;   /* cards, banners, sheets' inner panels */
+  --radius-small: 10px;   /* fields, menu items, small controls */
+  --radius-pill:  999px;  /* buttons, pills, tags */
+  --target:       44px;   /* minimum touch target */
+
+  /* ---------- Bars ---------- */
+  --bar-height:     52px;
+  --toolbar-height: 60px;
+  --brand-stripe:   2px;
+
+  /* ---------- Depth ---------- */
+  /* Light: cards lift with a faint shadow and hairline. Dark: shadows don't read, so the hairline
+     border does the work and the shadow fades out. */
+  --shadow-card:  0 1px 2px light-dark(rgb(9 24 39 / 0.05), transparent),
+                  0 1px 8px light-dark(rgb(9 24 39 / 0.04), transparent);
+  --shadow-float: 0 10px 30px light-dark(rgb(9 24 39 / 0.16), rgb(0 0 0 / 0.55)),
+                  0 1px 3px light-dark(rgb(9 24 39 / 0.10), rgb(0 0 0 / 0.40));
+
+  /* ---------- Motion ---------- */
+  --duration-fast: 120ms;
+  --duration:      220ms;
+  --duration-slow: 320ms;
+  --ease-out:      cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- Layers ---------- */
+  --z-bar: 5;
+  --z-sticky: 3;
+  --z-menu: 30;
+  --z-toast: 40;
+
+  /* ---------- Focus ---------- */
+  --focus-ring: 0 0 0 3px light-dark(rgb(11 79 174 / 0.35), rgb(116 173 255 / 0.45));
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration-fast: 0ms; --duration: 0ms; --duration-slow: 0ms; }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --text-2: light-dark(#2f4053, #c9d5e2);
+    --text-3: light-dark(#3f5266, #b0c0d1);
+    --separator: light-dark(rgb(9 24 39 / 0.22), rgb(255 255 255 / 0.22));
+    --border: var(--separator);
+  }
+}

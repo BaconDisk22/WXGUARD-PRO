@@ -7,6 +7,7 @@
 // and a row that goes somewhere is a button with a chevron.
 import { h } from './dom.js'
 import { icon } from './icons.js'
+import { t } from '../../l10n.js'
 
 /** The scrolling column of a screen. */
 export function List(...children) {
@@ -71,10 +72,22 @@ export function Button({ label, icon: iconName = null, kind = 'default', small =
   }, iconName ? icon(iconName, { size: small ? 16 : 18 }) : null, label != null ? h('span', null, label) : null)
 }
 
-/** An orange (or, with `kind: 'info'`, accent) notice with optional buttons under its text. */
-export function Banner({ icon: iconName = 'exclamationmark.triangle', text, detail = null, actions = [], kind = 'warning', key = null }) {
-  return h('div', { class: ['banner', kind === 'info' && 'banner--info'], key, role: 'status' },
-    icon(iconName),
+const BANNER_ICONS = {
+  warning: 'exclamationmark.triangle',
+  info: 'info.circle',
+  success: 'checkmark.circle',
+  error: 'exclamationmark.triangle.fill',
+}
+
+/**
+ * A notice in the flow of a screen with optional buttons under its text.
+ * `kind`: 'warning' (amber, the default) | 'info' | 'success' | 'error'. The icon follows the kind
+ * unless one is given. An error is announced at once (`role="alert"`); the rest politely.
+ */
+export function Banner({ icon: iconName = null, text, detail = null, actions = [], kind = 'warning', key = null }) {
+  const glyph = iconName ?? BANNER_ICONS[kind] ?? BANNER_ICONS.warning
+  return h('div', { class: ['banner', kind !== 'warning' && `banner--${kind}`], key, role: kind === 'error' ? 'alert' : 'status' },
+    icon(glyph),
     h('div', { class: 'banner__main' },
       h('div', null, h('div', null, text), detail ? h('div', { class: 'footnote' }, detail) : null),
       actions.length ? h('div', { class: 'cluster' }, actions) : null))
@@ -155,12 +168,37 @@ export function Switch({ checked, onchange, label, id = null, disabled = false }
     h('span'))
 }
 
-export function Spinner() {
-  return h('span', { class: 'spinner', role: 'progressbar', 'aria-label': 'Working' })
+export function Spinner({ label = null } = {}) {
+  return h('span', { class: 'spinner', role: 'progressbar', 'aria-label': label ?? t('web.kit.working') })
 }
 
 export function Empty(...children) {
   return h('div', { class: 'empty' }, children)
+}
+
+/**
+ * An empty state that says what is missing and what to do about it: an icon in a soft circle, a
+ * short title, a sentence, and at most one or two buttons.
+ */
+export function EmptyState({ icon: iconName = null, title, text = null, actions = [], key = null }) {
+  return h('div', { class: 'empty', key, role: 'status' },
+    iconName ? h('span', { class: 'empty__icon', 'aria-hidden': 'true' }, icon(iconName, { size: 24 })) : null,
+    h('p', { class: 'empty__title' }, title),
+    text != null ? h('p', { class: 'empty__text' }, text) : null,
+    actions.length ? h('div', { class: 'cluster', style: 'justify-content: center; margin-top: 8px' }, actions) : null)
+}
+
+/**
+ * A short-lived confirmation at the foot of the screen ("Saved", "Sent"). Announced to screen
+ * readers; never the only place something important is said.
+ */
+export function toast(text, { icon: iconName = 'checkmark.circle', duration = 2600 } = {}) {
+  document.querySelector('.toast')?.remove()
+  const node = h('div', { class: 'toast', role: 'status', 'aria-live': 'polite' },
+    iconName ? icon(iconName, { size: 18 }) : null, h('span', null, text))
+  document.body.append(node)
+  setTimeout(() => node.remove(), duration)
+  return node
 }
 
 /** Free text inside a card: a paragraph or several. */
@@ -191,9 +229,21 @@ export function openMenu(anchor, items) {
   const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.left + rect.width / 2 - width / 2))
   menu.style.left = `${left}px`
   menu.style.top = `${Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8)}px`
-  const onKey = (event) => { if (event.key === 'Escape') closeMenu() }
+  // Keyboard: arrows and Home/End move through the items, Escape or Tab closes and gives focus
+  // back to whatever opened the menu.
+  const onKey = (event) => {
+    const items = [...menu.querySelectorAll('.menu__item')]
+    const at = items.indexOf(document.activeElement)
+    const go = (i) => { event.preventDefault(); items[(i + items.length) % items.length]?.focus() }
+    if (event.key === 'Escape' || event.key === 'Tab') { event.preventDefault(); closeMenu() }
+    else if (event.key === 'ArrowDown') go(at + 1)
+    else if (event.key === 'ArrowUp') go(at < 0 ? items.length - 1 : at - 1)
+    else if (event.key === 'Home') go(0)
+    else if (event.key === 'End') go(items.length - 1)
+  }
   document.addEventListener('keydown', onKey)
-  current = { scrim, menu, onKey }
+  anchor.setAttribute?.('aria-expanded', 'true')
+  current = { scrim, menu, onKey, anchor }
   menu.querySelector('button')?.focus()
 }
 
@@ -201,8 +251,37 @@ let current = null
 
 export function closeMenu() {
   if (!current) return
-  current.scrim.remove()
-  current.menu.remove()
-  document.removeEventListener('keydown', current.onKey)
+  const { scrim, menu, onKey, anchor } = current
   current = null
+  scrim.remove()
+  menu.remove()
+  document.removeEventListener('keydown', onKey)
+  anchor?.setAttribute?.('aria-expanded', 'false')
+  if (anchor?.isConnected) anchor.focus?.({ preventScroll: true })
+}
+
+/**
+ * Asks before something that cannot be taken back (disconnecting, deleting, sending on the air).
+ * Resolves true only when the confirming button is pressed; Escape, Cancel or a click outside
+ * resolve false. Focus starts on Cancel, so a stray Return does nothing harmful.
+ */
+export function confirmAction({ title, message = null, confirmLabel, destructive = true }) {
+  return new Promise((resolve) => {
+    const finish = (answer) => { dialog.close(); dialog.remove(); resolve(answer) }
+    const cancel = h('button', { class: 'button', type: 'button', onclick: () => finish(false) }, t('web.kit.cancel'))
+    const dialog = h('dialog', { class: 'confirm', 'aria-labelledby': 'confirm-title' },
+      h('h2', { class: 'confirm__title', id: 'confirm-title' }, title),
+      message != null ? h('p', { class: 'confirm__message' }, message) : null,
+      h('div', { class: 'confirm__actions' },
+        cancel,
+        h('button', {
+          class: ['button', destructive ? 'button--danger' : 'button--primary'], type: 'button',
+          onclick: () => finish(true),
+        }, confirmLabel)))
+    dialog.addEventListener('cancel', (event) => { event.preventDefault(); finish(false) })
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) finish(false) })
+    document.body.append(dialog)
+    dialog.showModal()
+    cancel.focus()
+  })
 }

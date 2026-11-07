@@ -102,7 +102,8 @@ export async function build({ out, outlines = true } = {}) {
   const stamp = `MeshWX ${new Date().toISOString().slice(0, 10)}, build ${await commit()}, `
     + `protocol bundle ${protocol.version}${outlines ? '' : ', without the zone and county outlines'}`
 
-  const icon = await readFile(join(webRoot, 'assets/icon.svg'), 'utf8')
+  const icon = await readFile(join(webRoot, 'assets/wxguard-icon.svg'), 'utf8')
+  const iconURI = `data:image/svg+xml;base64,${Buffer.from(icon).toString('base64')}`
   // Every replacement below puts a file's contents into the page, so each one is a function:
   // as a string, `$&` and `$1` in the replacement are patterns, and the client's own
   // `escapeForRegExp` contains a `$&` that spliced the tag it was replacing into the bundle.
@@ -111,7 +112,8 @@ export async function build({ out, outlines = true } = {}) {
     .replace('<meta charset="utf-8">', () => `<meta charset="utf-8">\n  <meta name="generator" content="${stamp}">`)
     .replace(/\n\s*<link rel="manifest"[^>]*>/, '')              // there is no file beside this one
     .replace(/<link rel="icon" href="[^"]+" type="image\/svg\+xml">/,
-      () => `<link rel="icon" href="data:image/svg+xml;base64,${Buffer.from(icon).toString('base64')}" type="image/svg+xml">`)
+      () => `<link rel="icon" href="${iconURI}" type="image/svg+xml">`)
+    .replace(/src="assets\/wxguard-icon\.svg"/g, () => `src="${iconURI}"`)  // the loading screen's mark
     .replace(/\n\s*<link rel="stylesheet" href="[^"]+">/g, '')
     .replace('</head>', () => `  <style>\n${css}  </style>\n</head>`)
     .replace(/\s*<script type="module" src="[^"]+"><\/script>/,

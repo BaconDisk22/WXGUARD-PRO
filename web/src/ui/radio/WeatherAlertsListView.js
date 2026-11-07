@@ -108,7 +108,8 @@ export function WeatherAlertsListScreen({ app, page }) {
 
         sections,
 
-        Card({ key: 'status' },
+        // A gap is not calm weather: when the status asks for something, it reads as a warning.
+        Card({ key: 'status', class: statusAsks ? 'card--attention' : null },
           line != null
             ? AlertStatusRow({ app, page, line, source: sourceLine, request: alertsRequest, showsAskFootnotes: statusAsks })
             : h('div', { class: 'status-line' }, h('p', { class: 'line line--quiet' }, sourceLine))),

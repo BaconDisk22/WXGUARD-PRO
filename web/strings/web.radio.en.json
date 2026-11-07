@@ -7,5 +7,8 @@
   "web.radio.map.loading": "Loading the area outlines.",
   "web.radio.notifications.browserSettings": "Notifications are allowed or blocked for this site in your browser's settings.",
   "web.radio.other.title": "Other messages this radio delivered",
-  "web.radio.other.note": "Chats and channel messages that arrived while this tab held the radio. Reading them took them off the radio's queue, so they are listed here rather than lost. This tool does not reply to them."
+  "web.radio.other.note": "Chats and channel messages that arrived while this tab held the radio. Reading them took them off the radio's queue, so they are listed here rather than lost. This tool does not reply to them.",
+  "web.radio.glance": "At a glance",
+  "web.radio.how.show": "How asking for weather works",
+  "web.radio.how.hide": "Hide how asking works"
 }

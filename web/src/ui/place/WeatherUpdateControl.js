@@ -11,6 +11,7 @@
 
 import { h } from '../kit/dom.js'
 import { Spinner } from '../kit/components.js'
+import { icon } from '../kit/icons.js'
 import { t } from '../../l10n.js'
 import { WeatherUpdatePlan } from '../../screen/index.js'
 import { WeatherAskFootnotes } from './WeatherAskControl.js'
@@ -74,7 +75,7 @@ export function WeatherUpdateControl({ app, screen, plan, showsCaption = false }
       'aria-description': caption || null,
       title: caption || null,
       onclick: () => attempt(() => app.openConnect()),
-    }, h('span', null, t('web.place.connectRadio')))
+    }, icon('antenna.radiowaves.left.and.right', { size: 18 }), h('span', null, t('web.place.connectRadio')))
   }
 
   const isUpdating = screenValue(screen, 'isUpdating', (one) => one.model?.isUpdating?.({ pageID: one.pageID })) === true
@@ -95,7 +96,7 @@ export function WeatherUpdateControl({ app, screen, plan, showsCaption = false }
       if (screen == null) return
       attempt(() => screen.model?.update?.(held, { pageID: screen.pageID }))
     },
-  }, isUpdating ? Spinner() : null, h('span', null, t('weather.update.button')))
+  }, isUpdating ? Spinner() : icon('arrow.clockwise', { size: 18 }), h('span', null, t('weather.update.button')))
 
   if (!showsCaption) return button
 

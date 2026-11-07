@@ -44,6 +44,8 @@ export function WeatherRadioScreen({ app, page }) {
   // is kept: the statement does not move while the screen is open.
   let centreKey = null
   let centreName = null
+  // "How it works" is read once and then in the way: folded by default, one tap to open.
+  let showsHowItWorks = false
 
   const statement = () => {
     const botID = page?.snapshot?.source?.botID ?? null
@@ -159,10 +161,44 @@ export function WeatherRadioScreen({ app, page }) {
       const trafficCount = (model?.trafficEntries?.() ?? []).length
 
       return List(
-        // Four lines: where the request goes, where the answer goes, who keeps it, and what it
-        // costs. This is where "answers are public" is said (§11.1).
-        Card({ label: t('weather.about.howItWorks'), key: 'how' },
-          Prose(t('weather.about.line1'), t('weather.about.line2'), t('weather.about.line3'), t('weather.about.line4'))),
+        // The places people go from here most, together at the top (alerts, notifications, the
+        // stations reporting, what is held), instead of spread down the page under explanations.
+        Card({ label: t('web.radio.glance'), key: 'glance' },
+          Row({
+            key: 'alerts',
+            icon: 'exclamationmark.triangle',
+            title: t('weather.alertsList.title', page?.sourceName ?? ''),
+            value: String((snapshot?.alerts ?? []).length),
+            onclick: () => app.nav.push(WeatherAlertsListScreen({ app, page })),
+          }),
+          // What this phone will tell you about without the tool open (§16); here because
+          // everything about it depends on this radio being in range.
+          Row({
+            key: 'notifications',
+            icon: 'bell.fill',
+            title: t('weather.notifications.title'),
+            value: watchedCount > 0
+              ? t('weather.notifications.watchingCount', watchedCount)
+              : t('weather.notifications.watchingNone'),
+            onclick: () => app.nav.push(WeatherAlertNotificationsScreen({ app, page })),
+          }),
+          readings.length > 0
+            ? Row({
+              key: 'stations',
+              icon: 'thermometer.medium',
+              title: words.stationLink(readings.filter((one) => one.isInFootprint).length, readings.length, page.sourceName),
+              onclick: () => { pushPlaceScreen(app, 'WeatherStationsScreen', { app, page }) },
+            })
+            : null,
+          // What is being held, and how much of it is somebody else's question.
+          cacheTotal > 0
+            ? Row({
+              key: 'cache',
+              icon: 'tray.full',
+              title: t('weather.cache.row', cacheTotal),
+              onclick: () => app.nav.push(WeatherCachedScreen({ app, page })),
+            })
+            : null),
 
         // The source bot's own statement of its area (spec §7A), and nothing weaker: the stations
         // it happens to report this hour describe the weather, not the coverage (§3.1 I-B18).
@@ -212,44 +248,6 @@ export function WeatherRadioScreen({ app, page }) {
               onclick: () => app.nav.push(WeatherRequestsScreen({ app, page })),
             })
             : null),
-
-        readings.length > 0
-          ? Card({ key: 'stations' }, Row({
-            icon: 'thermometer.medium',
-            title: words.stationLink(readings.filter((one) => one.isInFootprint).length, readings.length, page.sourceName),
-            onclick: () => { pushPlaceScreen(app, 'WeatherStationsScreen', { app, page }) },
-          }))
-          : null,
-
-        // Every alert in the radio's area, with its map and its status line. It is here rather
-        // than on a place page because it is about what the radio is relaying (§7).
-        Card({ key: 'alerts' }, Row({
-          icon: 'exclamationmark.triangle',
-          title: t('weather.alertsList.title', page?.sourceName ?? ''),
-          value: String((snapshot?.alerts ?? []).length),
-          onclick: () => app.nav.push(WeatherAlertsListScreen({ app, page })),
-        })),
-
-        // The way in to what this phone will tell you about without the tool open (§16). It is
-        // on this page because everything about it depends on this radio being in range.
-        Card({ key: 'notifications' }, Row({
-          icon: 'bell.fill',
-          title: t('weather.notifications.title'),
-          value: watchedCount > 0
-            ? t('weather.notifications.watchingCount', watchedCount)
-            : t('weather.notifications.watchingNone'),
-          onclick: () => app.nav.push(WeatherAlertNotificationsScreen({ app, page })),
-        })),
-
-        // One disclosed row, at the foot of the page and nowhere else: what is being held, and
-        // how much of it is somebody else's question.
-        cacheTotal > 0
-          ? Card({ key: 'cache' }, Row({
-            icon: 'tray.full',
-            title: t('weather.cache.row', cacheTotal),
-            onclick: () => app.nav.push(WeatherCachedScreen({ app, page })),
-          }))
-          : null,
 
         // Web only. A browser tab that is the radio's companion is also the thing draining its
         // queue, so a chat or a channel message arrives here and nowhere else. Listed so it is
@@ -314,6 +312,21 @@ export function WeatherRadioScreen({ app, page }) {
             disabled: botRows.length < 2,
             onclick: botRows.length < 2 ? null : () => { model?.selectBot?.(row.botID); app.nav.refresh() },
           }))),
+
+        // Four lines: where the request goes, where the answer goes, who keeps it, and what it
+        // costs. This is where "answers are public" is said (§11.1). Folded until asked for.
+        Card({ label: t('weather.about.howItWorks'), key: 'how' },
+          showsHowItWorks
+            ? Prose(t('weather.about.line1'), t('weather.about.line2'), t('weather.about.line3'), t('weather.about.line4'))
+            : null,
+          Row({
+            key: 'how-toggle',
+            icon: 'info.circle',
+            title: showsHowItWorks ? t('web.radio.how.hide') : t('web.radio.how.show'),
+            chevron: false,
+            trailing: icon(showsHowItWorks ? 'chevron.up' : 'chevron.down', { size: 16 }),
+            onclick: () => { showsHowItWorks = !showsHowItWorks; app.nav.refresh() },
+          })),
 
         Card({ key: 'clear', foot: t('weather.about.clearFooter', page?.sourceName ?? '') },
           h('div', { class: 'sheet__actions' }, Button({

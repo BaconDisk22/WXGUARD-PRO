@@ -180,6 +180,7 @@ export function WeatherToolScreen({ app }) {
     return h('div', { class: 'toolbar__inner' },
       Button({
         label: t('weather.place.places'),
+        icon: 'list.bullet',
         kind: 'plain',
         strong: true,
         onclick: showPlaces,

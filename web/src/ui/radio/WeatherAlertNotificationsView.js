@@ -9,7 +9,7 @@
 // broadcast on `#meshwx` as they happen, so filtering them against a place costs the mesh
 // nothing, which is why the feature exists at all.
 import { h } from '../kit/dom.js'
-import { Card, List, Row, Switch } from '../kit/components.js'
+import { Banner, Card, List, Row, Switch } from '../kit/components.js'
 import { icon } from '../kit/icons.js'
 import { t } from '../../l10n.js'
 import { copy, Line, safeScreen } from './support.js'
@@ -80,12 +80,14 @@ export function WeatherAlertNotificationsScreen({ app, page = null }) {
 
       return List(
         model?.notificationsAuthorization === 'denied'
-          ? Card({ key: 'denied' },
-            h('div', { class: 'status-line' },
-              h('p', null, t('weather.notifications.denied')),
-              // iOS opens Settings here. A browser has no such door: the permission belongs to
-              // this site and is changed in the browser's own site settings.
-              Line(t('web.radio.notifications.browserSettings'))))
+          // iOS opens Settings here. A browser has no such door: the permission belongs to this
+          // site and is changed in the browser's own site settings, which the detail says.
+          ? Banner({
+            key: 'denied',
+            icon: 'bell.slash',
+            text: t('weather.notifications.denied'),
+            detail: t('web.radio.notifications.browserSettings'),
+          })
           : null,
 
         Card({ label: t('weather.notifications.placesHeader'), key: 'places' },

@@ -36,7 +36,7 @@
   padding: 48px 16px;
   text-align: center;
 }
-.page-preview__name { font-size: var(--text-title); font-weight: 600; }
+.page-preview__name { font-size: var(--text-title); font-weight: var(--weight-semibold); }
 
 /* ---------- The conditions hero (§8, §3.1.2 V-1) ---------- */
 
@@ -62,7 +62,7 @@
   max-width: 24em;
   padding-top: 8px;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   text-wrap: balance;
 }
 .hero__sentence {
@@ -158,7 +158,7 @@
   text-align: start;
   color: inherit;
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: var(--radius-small);
 }
 .place-row__main:hover { background: var(--surface-hover); }
 .place-row__tick { flex: none; color: var(--accent); display: grid; place-items: center; }
@@ -205,7 +205,7 @@
   background: none;
   color: var(--bad);
   font-size: var(--text-callout);
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   cursor: pointer;
 }
 .place-row__remove:hover { background: color-mix(in srgb, var(--bad) 12%, transparent); }
@@ -235,7 +235,7 @@
 /* ---------- The station screen (§12) ---------- */
 
 .station-summary { gap: 4px; }
-.station-summary__name { font-size: var(--text-title); font-weight: 600; }
+.station-summary__name { font-size: var(--text-title); font-weight: var(--weight-semibold); }
 .station-report { display: flex; flex-direction: column; gap: 2px; }
 .station-report .narrative { padding: 8px 0 0; margin: 0; white-space: pre-wrap; }
 
@@ -265,3 +265,10 @@
 .radar-card__body { display: flex; flex-direction: column; gap: 2px; padding: 10px 16px 2px; }
 .radar-card__line { font-size: var(--text-callout); }
 .radar-card:hover .card-map__open { background: var(--surface-hover); }
+
+/* ---------- First-visit welcome, at the top of Places ---------- */
+
+.welcome { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4) 0; text-align: center; }
+.welcome__mark { width: 56px; height: 56px; border-radius: 14px; box-shadow: var(--shadow-card); }
+.welcome__title { margin-top: var(--space-1); font-size: var(--text-title2); font-weight: var(--weight-bold); }
+.welcome__text { max-width: 36ch; font-size: var(--text-callout); color: var(--text-2); }

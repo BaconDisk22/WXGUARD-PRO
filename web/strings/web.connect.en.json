@@ -33,5 +33,14 @@
  "web.boot.tables": "Loading the weather tables…",
  "web.boot.failed": "The weather tables could not be loaded: %@",
  "web.boot.retry": "Try again",
- "web.nav.back": "Back"
+ "web.nav.back": "Back",
+ "web.connect.via.bluetooth": "Over Bluetooth",
+ "web.connect.via.serial": "Over USB",
+ "web.connect.via.bridge": "Through the development bridge",
+ "web.connect.via.demo": "Replaying recorded weather. Nothing goes on the air.",
+ "web.connect.via.simulated": "Simulated radio for testing",
+ "web.connect.via.none": "Choose how to connect below.",
+ "web.connect.disconnect.confirm.title": "Disconnect from %@?",
+ "web.connect.disconnect.confirm.message": "New weather and alerts stop arriving on this page until you connect again.",
+ "web.connect.disconnected.toast": "Disconnected"
 }

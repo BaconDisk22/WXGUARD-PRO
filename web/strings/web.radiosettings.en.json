@@ -90,5 +90,8 @@
   "web.radiosettings.error.unsupported": "This radio's firmware does not have that command.",
   "web.radiosettings.error.badState": "The radio would not do that just now.",
   "web.radiosettings.error.device": "The radio answered with error %d.",
-  "web.radiosettings.error.generic": "It did not go through: %@"
+  "web.radiosettings.error.generic": "It did not go through: %@",
+
+  "web.radiosettings.noRadio.title": "No radio connected",
+  "web.radiosettings.noRadio.action": "Connect a radio"
 }
