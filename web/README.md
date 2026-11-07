@@ -22,7 +22,7 @@ Nothing else. Nothing to install, no terminal, and no internet at any point.
 ## Start it
 
 1. Download the WXGUARD PRO web client from this fork's
-   [Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO/releases) when a verified web bundle is available.
+   [Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO-Releases/releases) when a verified web bundle is available.
 2. Double-click it. It opens in your usual browser: if that is Safari or Firefox, right-click the
    file instead, choose **Open With**, and pick Chrome.
 3. Press **No radio** at the top, then **Connect over Bluetooth** or **Connect over USB**, and

@@ -12,7 +12,7 @@ There are two ways to run WXGUARD PRO on a Mac. Most people want the app.
 
 ### Install
 
-1. Download `WXGUARD-PRO-macOS.zip` from the [Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO/releases).
+1. Download `WXGUARD-PRO-macOS.zip` from the [Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO-Releases/releases).
 2. Double-click the ZIP, then drag **WXGUARD PRO** into **Applications**.
 3. Open it. The first time, macOS blocks it because the app is not notarized by Apple:
    - Click **Done** (not "Move to Trash").

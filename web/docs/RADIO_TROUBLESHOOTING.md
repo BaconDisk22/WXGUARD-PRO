@@ -29,4 +29,4 @@ Open a [GitHub issue](https://github.com/TheLogsAreScreaming/WXGUARD-PRO/issues)
 
 ## Safety and release status
 
-The [standalone demonstration](../demo.html) contains **simulated** weather only. It does not issue radio transmissions or represent real NWS warnings. Check the [fork's Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO/releases) for available builds.
+The [standalone demonstration](../demo.html) contains **simulated** weather only. It does not issue radio transmissions or represent real NWS warnings. Check the [WXGUARD-PRO-Releases page](https://github.com/TheLogsAreScreaming/WXGUARD-PRO-Releases/releases) for available builds.
