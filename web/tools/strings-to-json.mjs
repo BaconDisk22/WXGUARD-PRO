@@ -42,6 +42,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (!existsSync(file)) continue
     const locale = dir.replace('.lproj', '')
     const table = parseStrings(readFileSync(file, 'utf8'))
+    // The upstream iOS app's name is not this app's: user-facing copy says WXGUARD PRO.
+    for (const key of Object.keys(table)) table[key] = table[key].replaceAll('DigitainoMesh', 'WXGUARD PRO')
     if (locale === 'en') english = table
     writeFileSync(join(out, `${locale}.json`), JSON.stringify(table, null, 1) + '\n')
     console.log(`${locale}: ${Object.keys(table).length} keys`)

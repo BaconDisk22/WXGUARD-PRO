@@ -25,7 +25,7 @@
 // the pure rules only — the preset table, the firmware's ranges, the event tally and the name of an
 // error code. Every byte still goes through `RadioConnection`.
 import { h } from '../kit/dom.js'
-import { Banner, Button, Card, Field, List, Prose, Row, Select, Switch } from '../kit/components.js'
+import { Banner, Button, Card, EmptyState, Field, List, Prose, Row, Select, Switch } from '../kit/components.js'
 import { t } from '../../l10n.js'
 import {
   RadioActivity,
@@ -451,7 +451,12 @@ export function RadioSettingsScreen({ app }) {
   const render = () => {
     reseedIfRadioChanged()
     if (!connection.canConfigureRadio) {
-      return List(Card({}, Prose(t('web.radiosettings.noRadio'))))
+      return List(EmptyState({
+        icon: 'antenna.radiowaves.left.and.right',
+        title: t('web.radiosettings.noRadio.title'),
+        text: t('web.radiosettings.noRadio'),
+        actions: [Button({ label: t('web.radiosettings.noRadio.action'), kind: 'primary', onclick: () => app.openConnect?.() })],
+      }))
     }
     const heard = RadioActivity.heard(connection.radioEvents)
     return List(

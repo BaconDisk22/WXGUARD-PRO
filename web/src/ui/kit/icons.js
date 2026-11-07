@@ -229,6 +229,7 @@ export const ICONS = {
   'chevron.left': { paths: '<polyline points="14.5 5.5 8 12 14.5 18.5"/>' },
   'chevron.right': { paths: '<polyline points="9.5 5.5 16 12 9.5 18.5"/>' },
   'chevron.down': { paths: '<polyline points="5.5 9.5 12 16 18.5 9.5"/>' },
+  'chevron.up': { paths: '<polyline points="5.5 14.5 12 8 18.5 14.5"/>' },
 
   xmark: {
     paths: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
@@ -575,6 +576,24 @@ export function icon(name, { size = 20, label = null, className = '' } = {}) {
 }
 
 /** Every name this module answers to, drawings first then aliases. */
+/**
+ * The WXGUARD PRO mark (assets/wxguard-icon.svg), drawn inline so it works in the single-file
+ * build too, where there is no assets folder beside the page. Decorative: hidden from readers.
+ */
+const BRAND_MARK = '<rect width="512" height="512" rx="112" fill="#091827"/><path d="M256 65 414 125v112c0 110-65 179-158 222C163 416 98 347 98 237V125z" fill="#002D72" stroke="#FF4B00" stroke-width="18"/><circle cx="256" cy="245" r="99" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="10"/><circle cx="256" cy="245" r="59" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="8"/><path d="M256 245 333 181" stroke="#FF4B00" stroke-width="15" stroke-linecap="round"/><circle cx="256" cy="245" r="15" fill="#FF4B00"/><path d="M195 341h122" stroke="#fff" stroke-width="15" stroke-linecap="round"/>'
+
+export function brandMark({ size = 56, className = '' } = {}) {
+  const el = document.createElementNS(SVG_NS, 'svg')
+  el.setAttribute('viewBox', '0 0 512 512')
+  el.setAttribute('width', String(size))
+  el.setAttribute('height', String(size))
+  el.setAttribute('aria-hidden', 'true')
+  el.setAttribute('focusable', 'false')
+  if (className) el.setAttribute('class', className)
+  el.innerHTML = BRAND_MARK
+  return el
+}
+
 export function iconNames() {
   return [...Object.keys(ICONS), ...Object.keys(ALIASES)].sort();
 }

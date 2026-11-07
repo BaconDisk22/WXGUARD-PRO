@@ -22,7 +22,7 @@
 // all (§3.1 U-3).
 
 import { h } from '../kit/dom.js'
-import { icon } from '../kit/icons.js'
+import { brandMark, icon } from '../kit/icons.js'
 import { Button, Card, Row } from '../kit/components.js'
 import { t } from '../../l10n.js'
 import { MeshWXGeo, MeshWXTables, MeshWXZip } from '../../meshwx/index.js'
@@ -435,6 +435,19 @@ export function WeatherPlacePickerView({ app }) {
     return [townCard, stationCard]
   }
 
+  /**
+   * First visit only (nothing saved, location never asked): the sheet is also the welcome, so it
+   * says what it is for and that nothing is asked of the browser until My location is tapped.
+   */
+  function welcome() {
+    if (state.applied !== '' || savedPlaces().length > 0) return null
+    if (attempt(() => model()?.placeState) !== 'needsPermission') return null
+    return h('div', { class: 'welcome', key: 'welcome' },
+      brandMark({ size: 56, className: 'welcome__mark' }),
+      h('h3', { class: 'welcome__title' }, t('web.place.welcome.title')),
+      h('p', { class: 'welcome__text' }, t('web.place.welcome.text')))
+  }
+
   // MARK: - Presenting
 
   handle = app?.nav?.sheet?.({
@@ -448,6 +461,7 @@ export function WeatherPlacePickerView({ app }) {
         onclick: () => { state.isEditing = !state.isEditing; refresh() },
       })),
     render: () => h('div', { class: 'list' },
+      welcome(),
       searchField(),
       state.applied === ''
         ? [currentLocationSection(), deniedSection(), savedSection(), heardSection()]

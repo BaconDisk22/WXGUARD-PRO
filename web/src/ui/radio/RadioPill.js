@@ -26,5 +26,5 @@ export function RadioPill({ app }) {
     key: 'radio-pill',
     'aria-label': `${text}. ${t('web.radio.pill.action')}`,
     onclick: () => app?.openConnect?.(),
-  }, h('span', null, text))
+  }, h('span', { class: 'pill__text' }, text))
 }

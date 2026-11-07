@@ -17,7 +17,7 @@ const LOCALES = ['en', 'de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'uk', 'zh
 // Node fallback globs them instead. Keep the two in step when a screen adds a table.
 const WEB_TABLES = [
   'web.en.json', 'web.connect.en.json', 'web.place.en.json', 'web.radio.en.json',
-  'web.radiosettings.en.json',
+  'web.radiosettings.en.json', 'web.kit.en.json',
 ]
 const json = (url) => readJSON(url)
 const optionalJSON = (url) => json(url).catch(() => ({}))
