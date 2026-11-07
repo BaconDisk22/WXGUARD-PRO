@@ -219,7 +219,7 @@ func portBelongsToWXGUARD(_ port: UInt16) -> Bool {
 
 struct Browser {
     let name: String
-    let executable: URL
+    let appURL: URL
 }
 
 /// Chromium browsers only: Safari and Firefox have neither Web Bluetooth nor Web Serial.
@@ -234,7 +234,7 @@ func findBrowser() -> Browser? {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id),
               let exe = Bundle(url: url)?.executableURL,
               FileManager.default.isExecutableFile(atPath: exe.path) else { continue }
-        return Browser(name: name, executable: exe)
+        return Browser(name: name, appURL: url)
     }
     return nil
 }
@@ -259,7 +259,7 @@ func webRoot() -> URL? {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     var server: StaticServer?
     var browser: Browser?
-    var browserProcess: Process?
+    var browserApp: NSRunningApplication?
     var port: UInt16 = defaultPort
 
     var pageURL: String { "http://127.0.0.1:\(port)/" }
@@ -271,6 +271,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         port = configuredPort()
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self, selector: #selector(appTerminated(_:)),
+            name: NSWorkspace.didTerminateApplicationNotification, object: nil)
         guard let root = webRoot(), FileManager.default.fileExists(atPath: root.appendingPathComponent("index.html").path) else {
             return fail("The app is incomplete: its web client is missing. Download WXGUARD PRO again.")
         }
@@ -306,49 +309,56 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         launchBrowser(primary: true)
     }
 
-    /// The first launch is the browser process for this profile; tracking its exit is how the app
-    /// knows the window is gone for good. A later launch with the same profile hands its URL to that
-    /// process and exits at once, so it is not tracked.
+    /// The browser is started through LaunchServices as a new instance, not as a child process.
+    /// A child process would make this app macOS's "responsible process" for the browser, so the
+    /// browser's own self-update (which rewrites its .app) would be blocked by App Management and
+    /// reported as "WXGUARD PRO was prevented from modifying apps on your Mac".
+    ///
+    /// The first instance owns this profile; its exit is how the app knows the window is gone for
+    /// good. A later launch with the same profile hands its URL to that instance and exits, so it
+    /// is not tracked.
     func launchBrowser(primary: Bool) {
         guard let browser else { return }
         try? FileManager.default.createDirectory(at: profileDir, withIntermediateDirectories: true)
-        let process = Process()
-        process.executableURL = browser.executable
-        process.arguments = [
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        config.activates = true
+        config.addsToRecentItems = false
+        config.arguments = [
             "--app=\(pageURL)",
             "--user-data-dir=\(profileDir.path)",
             "--no-first-run",
             "--no-default-browser-check",
             "--window-size=1360,880",
         ]
-        if primary {
-            process.terminationHandler = { _ in
-                DispatchQueue.main.async {
-                    log("\(browser.name) window closed; stopping")
-                    NSApp.terminate(nil)
+        NSWorkspace.shared.openApplication(at: browser.appURL, configuration: config) { running, error in
+            DispatchQueue.main.async { [self] in
+                guard let running, error == nil else {
+                    return fail("Could not open \(browser.name): \(error?.localizedDescription ?? "unknown error")")
                 }
-            }
-        }
-        do {
-            try process.run()
-            if primary {
-                browserProcess = process
+                log("opened \(pageURL) in \(browser.name) app window (pid \(running.processIdentifier))")
+                guard primary else { return }
+                browserApp = running
                 sawWindow = false
                 emptyPolls = 0
                 watchWindows()
             }
-            log("opened \(pageURL) in \(browser.name) app window")
-        } catch {
-            fail("Could not open \(browser.name): \(error.localizedDescription)")
         }
+    }
+
+    @objc func appTerminated(_ note: Notification) {
+        guard let gone = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
+              let ours = browserApp, gone.processIdentifier == ours.processIdentifier else { return }
+        log("\(browser?.name ?? "browser") window closed; stopping")
+        browserApp = nil
+        NSApp.terminate(nil)
     }
 
     /// Opening the app again (Finder, Dock, Spotlight) brings the existing window forward.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if let p = browserProcess, p.isRunning {
-            if windowCount(pid: p.processIdentifier) > 0,
-               let running = NSRunningApplication(processIdentifier: p.processIdentifier) {
-                running.activate()
+        if let app = browserApp, !app.isTerminated {
+            if windowCount(pid: app.processIdentifier) > 0 {
+                app.activate()
             } else {
                 launchBrowser(primary: false)
             }
@@ -378,8 +388,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var emptyPolls = 0
     func watchWindows() {
         Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            guard let self, let p = self.browserProcess, p.isRunning else { timer.invalidate(); return }
-            if self.windowCount(pid: p.processIdentifier) > 0 {
+            guard let self, let app = self.browserApp, !app.isTerminated else { timer.invalidate(); return }
+            if self.windowCount(pid: app.processIdentifier) > 0 {
                 self.sawWindow = true
                 self.emptyPolls = 0
             } else if self.sawWindow {
@@ -387,9 +397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if self.emptyPolls >= 3 {
                     timer.invalidate()
                     log("app window closed; quitting browser")
-                    if let running = NSRunningApplication(processIdentifier: p.processIdentifier),
-                       running.terminate() { return }
-                    p.terminate()
+                    app.terminate()
                 }
             }
         }
@@ -397,7 +405,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         server?.stop()
-        if let p = browserProcess, p.isRunning { p.terminate() }
+        if let app = browserApp, !app.isTerminated { app.terminate() }
     }
 
     func fail(_ message: String) {
