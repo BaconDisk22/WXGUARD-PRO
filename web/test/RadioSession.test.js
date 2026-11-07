@@ -4,7 +4,7 @@
 // `MeshCore/Tests/MeshCoreTests/Session/` (`MeshCoreSessionCommandCorrelationTests`,
 // `GetMessageTimeoutTests`, `AutoMessageFetchTests`).
 
-import test from 'node:test'
+import test, { after } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   FakeRadioTransport,
@@ -13,6 +13,12 @@ import {
   makeFakeContact,
   utf8Encode,
 } from '../src/radio/index.js'
+
+// MeshCoreSession unrefs its command timers so a Node tool never hangs on one. A test that waits
+// on nothing but such a timer would then let the event loop run dry, and Node 22's runner ends the
+// file with "Promise resolution is still pending". Hold the loop open while these tests run.
+const keepAlive = setInterval(() => {}, 1000)
+after(() => clearInterval(keepAlive))
 
 const RADIO_KEY = Uint8Array.from(Array.from({ length: 32 }, (_, i) => (i + 1) & 0xff))
 
